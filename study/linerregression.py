@@ -37,7 +37,12 @@ init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
-#做100次迭代(这里称为训练), 打印出当前拟合的参数
-for step in range(100):
+traincount = 100
+printstep = 1
+#做traincount次迭代(这里称为训练), 打印出当前拟合的参数
+print('weights:' + str(sess.run(Weights)))
+print('biases:' + str(sess.run(biases)))
+for step in range(traincount):
     sess.run(train)
-    print(step,sess.run(Weights), sess.run(biases))
+    if(0 == step % printstep):
+        print(step,sess.run(Weights), sess.run(biases))
