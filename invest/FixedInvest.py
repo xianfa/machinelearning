@@ -1,24 +1,28 @@
 import sys
+import matplotlib
+import numpy as np
 import tushare as ts
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 #handle input parameters
-print '\n'
-print 'Script File Name:', sys.argv[0]
+print('\n')
+print('Script File Name:'+ sys.argv[0])
 
 if 4 > len(sys.argv):
- print 'Usage:python FixedInvest stockcode starttime endtime [high]'
- print '\n'
+ print('Usage:python FixedInvest stockcode starttime endtime [high]')
+ print('\n')
  exit()
 
-print 'StockCode:', sys.argv[1]
-print 'StartTime:', sys.argv[2]
-print 'EndTime:', sys.argv[3]
+print('StockCode:' + sys.argv[1])
+print('StartTime:' + sys.argv[2])
+print('EndTime:' + sys.argv[3])
 
 #get the history price
 histdata = ts.get_hist_data(sys.argv[1],start=sys.argv[2],end=sys.argv[3])
 if 0 == len(histdata):
- print 'Get histdata Failed'
- print '\n'
+ print('Get histdata Failed')
+ print('\n')
  exit()
 
 lastprice = 0
@@ -38,7 +42,7 @@ lastprice = newcloselist[0]
 newcloselist.reverse()
 newcloselist.append(lastprice)
 
-print newcloselist
+print(newcloselist)
 
 for i in range(0, len(newcloselist)):
  strprice = '%.2f' % newcloselist[i]
@@ -63,11 +67,13 @@ for i in range(0, len(newcloselist)):
    for k in range(0, spacenum):
     strline += ' '
    strline += strprofit
- print strline
+ print(strline)
 
 profitloss = 'PROFLOSS'
 totalin = ' TOTALIN'
 percent = ' PERCENT'
+
+percentarray = []
 
 for i in range(1, len(newcloselist)):
  strtotalin = '%d' % i
@@ -86,27 +92,22 @@ for i in range(1, len(newcloselist)):
  profitloss += strtotalprofitloss
 
  strpercent = '%.2f' % (totalprofitloss/i)
+ percentarray.append(totalprofitloss/i)
  spacenum = 8 - len(strpercent)
  for j in range(0, spacenum):
   percent += ' '
  percent += strpercent
 
-print profitloss
-print totalin
-print percent
-print '\n'
+print(profitloss)
+print(totalin)
+print(percent)
+print('\n')
 
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import numpy as np
-
-weight = [217.8,216.1,217,213.3,212.8,214.2,213.4,211.3,211.6,211.2,210.2,210.7,210,209,208.5,208.6,208.7,207.8,207.2,204.9,203.4,204.6,204.7,205,205.2,203.2,203.7,204.2,205.8,205.2]
-x = np.linspace(0,len(weight)-1, len(weight))
-y = np.array(weight)
+x = np.linspace(0,len(percentarray)-1, len(percentarray))
+y = np.array(percentarray)
 
 plt.plot(x, y)
-plt.title('Weight change chart', fontsize=20)
+plt.title('fixinvest profitloss percent chart', fontsize=20)
 plt.savefig('./test.jpg')
 plt.show()
 
