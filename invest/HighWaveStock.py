@@ -3,15 +3,15 @@ import tushare as ts
 
 
 #handle input parameters
-print 'Script File Name:', sys.argv[0]
+print('Script File Name:' + sys.argv[0])
 
 if 4 != len(sys.argv):
- print 'Usage:python HighWaveStock.py starttime endtime MinMeanWeave'
+ print('Usage:python HighWaveStock.py starttime endtime MinMeanWeave')
  exit()
 
-print 'StartTime:', sys.argv[1]
-print 'EndTime:', sys.argv[2]
-print 'MinMeanWave:', sys.argv[3]
+print('StartTime:' + sys.argv[1])
+print('EndTime:' + sys.argv[2])
+print('MinMeanWave:' + sys.argv[3])
 
 #get all the stock code then get everyone history data and handle it
 basicinfo = ts.get_stock_basics()
@@ -39,23 +39,23 @@ for code in basicinfo.index:
    currentprofitsum += currentprofitloss
   meanwave = curentwavesum/(len(histdata)-1)*100
   weaves[code] = meanwave
-  print code, ',', currentprofitsum
+  print (code + ',' +str(currentprofitsum))
   profitloss[code] = currentprofitsum
 
-print '\nHigh weave stocks'
+print('\nHigh weave stocks')
 for key in weaves:
  if weaves[key] > float(sys.argv[3]):
-  print key, ',', weaves[key]
+  print(key + ',' + str(weaves[key]))
 
-print '\nBig loss stocks'
+print('\nBig loss stocks')
 for key in profitloss:
  if profitloss[key] < 0:
-  print key, ',', profitloss[key]
+  print(key + ',' + str(profitloss[key]))
 
 basicinfo.loc[((basicinfo.index >= u'600000') | (basicinfo.index < u'100000')) & (basicinfo['timeToMarket'] < 20160218) & (basicinfo['pe'] > 0) & (basicinfo['pe'] < 20) & (basicinfo['bvps']*basicinfo['totals']*basicinfo['pb'] < 50)].to_csv('./basicinfo.csv')
 
 histdata = ts.get_hist_data('601595',start='2016-09-07',end='2016-09-20')
-print histdata
+print(histdata)
 
 rownum = len(histdata)
 
@@ -67,9 +67,9 @@ for price in histdata[0:1]['high']:
 newcloselist = []
 closelist = histdata['close']
 for price in closelist:
- print price
+ print(price)
  newcloselist.append(price)
 
 newcloselist[0] = lastprice
 newcloselist.reverse()
-print newcloselist
+print(newcloselist)

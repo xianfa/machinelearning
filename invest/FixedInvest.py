@@ -5,109 +5,149 @@ import tushare as ts
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-#handle input parameters
-print('\n')
-print('Script File Name:'+ sys.argv[0])
+#format string with space
+def formatstr(strsource, totallen):
+    str = ''
+    spacenum = totallen - len(strsource)
+    for k in range(0, spacenum):
+        str += ' '
+    str += strsource
+    return str
 
-if 4 > len(sys.argv):
- print('Usage:python FixedInvest stockcode starttime endtime [high]')
- print('\n')
- exit()
+def printpolicyinfo(policyname, profitlossarray, totalinarray, percentarray, lastprice):
+    print('\nPolicy Name:' + policyname)
 
-print('StockCode:' + sys.argv[1])
-print('StartTime:' + sys.argv[2])
-print('EndTime:' + sys.argv[3])
+    profitloss = 'PROFLOSS'
+    totalin = ' TOTALIN'
+    percent = ' PERCENT'
 
-#get the history price
-histdata = ts.get_hist_data(sys.argv[1],start=sys.argv[2],end=sys.argv[3])
-if 0 == len(histdata):
- print('Get histdata Failed')
- print('\n')
- exit()
+    for i in range(0, len(profitlossarray)):
+        profitloss += formatstr('%.2f' % profitlossarray[i], 8)
+        totalin += formatstr('%.1f' % totalinarray[i], 8)
+        percent += formatstr('%.3f' % percentarray[i], 8)
+    
+    print(profitloss)
+    print(totalin)
+    print(percent)
 
-lastprice = 0
-for price in histdata[0:1]['high']:
- lastprice = price
-
-#copy close to a list
-newcloselist = []
-closelist = histdata['close']
-for price in closelist:
- newcloselist.append(price)
-
-#change the last close price to high price
-if 4 < len(sys.argv):
- newcloselist[0] = lastprice
-lastprice = newcloselist[0]
-newcloselist.reverse()
-newcloselist.append(lastprice)
-
-print(newcloselist)
-
-for i in range(0, len(newcloselist)):
- strprice = '%.2f' % newcloselist[i]
- spacenum = 8-len(strprice)
- strline = ''
- for j in range(0, spacenum):
-  strline += ' '
- strline += strprice
+    totalincount = len(percentarray)
+    lastpercent = percentarray[totalincount-1]
+    if lastpercent < 0:
+        goalrisepercent = -100*lastpercent/(100+lastpercent)
+        print('\nGoal price:' + '%.2f' %(lastprice/(1+lastpercent/100)))
+        print('Goal rise percent:' + '%.2f' %(goalrisepercent))
+        print('Total in:' + '%.2f' %(totalinarray[totalincount-1]))
+        print('Goal profit:' + '%.2f' %(totalinarray[totalincount-1]*goalrisepercent/100))
+        print('\n')
 
 
- #empty column handle
- for empty in range(0, i):
-  strline += '        '
 
- #profit and loss handle
- for j in range(i+1, len(newcloselist)):
-   profit = newcloselist[j]/newcloselist[i] - 1
-   profit *= 100
-   strprofit = '%.2f' % profit
-   #space handle
-   spacenum = 8-len(strprofit)
-   for k in range(0, spacenum):
-    strline += ' '
-   strline += strprofit
- print(strline)
+if __name__ == '__main__':
+    
+    #handle input parameters
+    print('\n')
+    print('Script File Name:'+ sys.argv[0])
+    
+    if 4 > len(sys.argv):
+        print('Usage:python FixedInvest stockcode starttime endtime [high]')
+        print('\n')
+        exit()
+    
+    #print input parameters
+    print('StockCode:' + sys.argv[1])
+    print('StartTime:' + sys.argv[2])
+    print('EndTime:' + sys.argv[3])
+    print('\n')
+    
+    #get the history price
+    histdata = ts.get_hist_data(sys.argv[1],start=sys.argv[2],end=sys.argv[3])
+    if 0 == len(histdata):
+        print('Get histdata Failed')
+        print('\n')
+        exit()
+    
+    #handle price list
+    lastprice = histdata[0:1]['high'].values[0]
+    newcloselist = histdata['close'].values.tolist()
+    
+    #change the last close price to high price
+    if 4 < len(sys.argv):
+        newcloselist[0] = lastprice
+    lastprice = newcloselist[0]
+    newcloselist.reverse()
+    newcloselist.append(lastprice)
+    
+    print(newcloselist)
+    print('\n')
+    
+    #compute and print invest info
+    for i in range(0, len(newcloselist)):
+        strprice = '%.3f' % newcloselist[i]
+        strline = ''
+        strline += formatstr(strprice, 8)
+        
+        #empty column handle
+        for empty in range(0, i):
+            strline += '        '
+            
+        #profit and loss handle
+        for j in range(i+1, len(newcloselist)):
+            profit = newcloselist[j]/newcloselist[i] - 1
+            profit *= 100
+            strprofit = '%.3f' % profit
+            strline += formatstr(strprofit, 8)
+        print(strline)
 
-profitloss = 'PROFLOSS'
-totalin = ' TOTALIN'
-percent = ' PERCENT'
+    #compute profitloss totalin and percent for every policy 
+    fixprofitlossarray = []
+    fixtotalinarray = []
+    fixpercentarray = []
 
-percentarray = []
+    fixaddprofitlossarray = []
+    fixaddtotalinarray = []
+    fixaddpercentarray = []
 
-for i in range(1, len(newcloselist)):
- strtotalin = '%d' % i
- spacenum = 8-len(strtotalin)
- for j in range(0, spacenum):
-  totalin += ' '
- totalin += strtotalin
+    #fix in value is 1000
+    currentfixtotalin = 0
+    currentfixaddtotalin = 0
 
- totalprofitloss = 0
- for j in range(0, i):
-  totalprofitloss += ((newcloselist[i]/newcloselist[j]-1)*100)
- strtotalprofitloss = '%.2f' % totalprofitloss
- spacenum = 8 - len(strtotalprofitloss)
- for j in range(0, spacenum):
-  profitloss += ' '
- profitloss += strtotalprofitloss
+    fixstockcount = 0
+    fixaddstockcount = 0
+    for i in range(1, len(newcloselist)):
 
- strpercent = '%.2f' % (totalprofitloss/i)
- percentarray.append(totalprofitloss/i)
- spacenum = 8 - len(strpercent)
- for j in range(0, spacenum):
-  percent += ' '
- percent += strpercent
+        #compute invest money
+        currentfixin = 1000
+        currentfixaddin = 1000
+        if i > 1 and newcloselist[i] < newcloselist[0]:
+            currentfixaddin += (newcloselist[0]/newcloselist[i-1]-1)*1000
+        
+        #all invest money
+        currentfixtotalin += currentfixin
+        currentfixaddtotalin += currentfixaddin
 
-print(profitloss)
-print(totalin)
-print(percent)
-print('\n')
+        fixstockcount += currentfixin/newcloselist[i-1]
+        fixaddstockcount += currentfixaddin/newcloselist[i-1]
 
-x = np.linspace(0,len(percentarray)-1, len(percentarray))
-y = np.array(percentarray)
+        fixtotalinarray.append(currentfixtotalin)
+        fixaddtotalinarray.append(currentfixaddtotalin)
+        
+        #compute profitloss
+        profitloss = fixstockcount*newcloselist[i] - currentfixtotalin
+        fixprofitlossarray.append(profitloss)
+        fixpercentarray.append(100*profitloss/currentfixtotalin)
 
-plt.plot(x, y)
-plt.title('fixinvest profitloss percent chart', fontsize=20)
-plt.savefig('./test.jpg')
-plt.show()
+        profitloss = fixaddstockcount*newcloselist[i] - currentfixaddtotalin
+        fixaddprofitlossarray.append(profitloss)
+        fixaddpercentarray.append(100*profitloss/currentfixaddtotalin)
+
+    printpolicyinfo('Fix Invest', fixprofitlossarray, fixtotalinarray, fixpercentarray, lastprice)
+    printpolicyinfo('Fix Add Invest', fixaddprofitlossarray, fixaddtotalinarray, fixaddpercentarray, lastprice)
+    
+    x = np.linspace(0,len(fixpercentarray)-1, len(fixpercentarray))
+    y = np.array(fixpercentarray)
+    
+    plt.plot(x, y)
+    plt.title('fixinvest profitloss percent chart', fontsize=20)
+    plt.savefig('./fixinvest.jpg')
+    plt.show()
 
