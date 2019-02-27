@@ -39,7 +39,6 @@ for code in basicinfo.index:
    currentprofitsum += currentprofitloss
   meanwave = curentwavesum/(len(histdata)-1)*100
   weaves[code] = meanwave
-  print (code + ',' +str(currentprofitsum))
   profitloss[code] = currentprofitsum
 
 print('\nHigh weave stocks')
@@ -50,7 +49,8 @@ for key in weaves:
 print('\nBig loss stocks')
 for key in profitloss:
  if profitloss[key] < 0:
-  print(key + ',' + str(profitloss[key]))
+  #print(key + ',' + str(profitloss[key]))
+  pass
 
 basicinfo.loc[((basicinfo.index >= u'600000') | (basicinfo.index < u'100000')) & (basicinfo['timeToMarket'] < 20160218) & (basicinfo['pe'] > 0) & (basicinfo['pe'] < 20) & (basicinfo['bvps']*basicinfo['totals']*basicinfo['pb'] < 50)].to_csv('./basicinfo.csv')
 
