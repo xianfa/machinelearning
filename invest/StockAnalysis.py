@@ -22,6 +22,7 @@ for code in basicinfo.index:
     if histdata is None:
         continue
     if 1 < len(histdata):
+        print('StockCode:' + code)
         curentwavesum = 0.0
         currentprofitsum = 0.0
         highwave = 0.0
@@ -42,7 +43,9 @@ for code in basicinfo.index:
         if meanwave > float(sys.argv[3]):
             #fix invest profitloss infomation
             closelist = histdata['close'].values.tolist()
+            highlist = histdata['high'].values.tolist()
             closelist.reverse()
+            highlist.reverse()
 
             investcount = 0
             profitloss = 0
@@ -56,13 +59,15 @@ for code in basicinfo.index:
                 currentprofitsum = 0
                 for i in range(startindex, currentindex):
                     investcount += 1
-                    currentprofitloss = (closelist[currentindex]/closelist[i] - 1)*1000
+                    currentprofitloss = (highlist[currentindex]/closelist[i] - 1)*1000
                     currentprofitsum += currentprofitloss
                 if currentprofitsum < 0:
                     currentindex += 1
                 else:
                     startindex = currentindex
                     currentindex += 1
+                    if investcount > 10:
+                        print('UseTime:' + str(investcount))
 
             #print the result
             if(currentprofitsum < 0):
@@ -73,26 +78,3 @@ for code in basicinfo.index:
                 print('ProfitLoss:' + '%.2f' % currentprofitsum)
                 print('Percent:' + '%.2f' % (currentprofitsum/investcount/10))
                 print('\n')
-
-
-basicinfo.loc[((basicinfo.index >= u'600000') | (basicinfo.index < u'100000')) & (basicinfo['timeToMarket'] < 20160218) & (basicinfo['pe'] > 0) & (basicinfo['pe'] < 20) & (basicinfo['bvps']*basicinfo['totals']*basicinfo['pb'] < 50)].to_csv('./basicinfo.csv')
-
-histdata = ts.get_hist_data('601595',start='2016-09-07',end='2016-09-20')
-print(histdata)
-
-rownum = len(histdata)
-
-lastprice = 0
-for price in histdata[0:1]['high']:
- lastprice = price
-
-#copy close to a list
-newcloselist = []
-closelist = histdata['close']
-for price in closelist:
- print(price)
- newcloselist.append(price)
-
-newcloselist[0] = lastprice
-newcloselist.reverse()
-print(newcloselist)

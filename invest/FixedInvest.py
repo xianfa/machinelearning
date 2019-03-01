@@ -1,6 +1,7 @@
 import sys
 import matplotlib
 import numpy as np
+import pandas as pd
 import tushare as ts
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -48,19 +49,28 @@ if __name__ == '__main__':
     print('\n')
     print('Script File Name:'+ sys.argv[0])
     
-    if 4 > len(sys.argv):
-        print('Usage:python FixedInvest stockcode starttime endtime [high]')
+    if (4 != len(sys.argv)) & (5 != len(sys.argv)) & (3 != len(sys.argv)):
+        print('Usage:python FixedInvest.py stockcode starttime endtime [high]')
+        print('Usage:python FixedInvest.py stockcode klinetype')
         print('\n')
         exit()
     
     #print input parameters
-    print('StockCode:' + sys.argv[1])
-    print('StartTime:' + sys.argv[2])
-    print('EndTime:' + sys.argv[3])
-    print('\n')
+    if len(sys.argv) >= 4:
+        print('StockCode:' + sys.argv[1])
+        print('StartTime:' + sys.argv[2])
+        print('EndTime:' + sys.argv[3])
+        print('\n')
+    if 2 == len(sys.argv):
+        print('StockCode:' + sys.argv[1])
+        print('KlineType:' + sys.argv[2])
     
     #get the history price
-    histdata = ts.get_hist_data(sys.argv[1],start=sys.argv[2],end=sys.argv[3])
+    histdata = pd.DataFrame()
+    if len(sys.argv) >= 4:
+        histdata = ts.get_hist_data(sys.argv[1],start=sys.argv[2],end=sys.argv[3])
+    else:
+        histdata = ts.get_hist_data(sys.argv[1],ktype=sys.argv[2])
     if 0 == len(histdata):
         print('Get histdata Failed')
         print('\n')
@@ -96,7 +106,7 @@ if __name__ == '__main__':
             profit *= 100
             strprofit = '%.3f' % profit
             strline += formatstr(strprofit, 8)
-        print(strline)
+        #print(strline)
 
     #compute profitloss totalin and percent for every policy 
     fixprofitlossarray = []
