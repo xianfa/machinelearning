@@ -70,11 +70,10 @@ if 1 < len(histdata):
                     print('UseTime:' + str(investcount))
 
         #print the result
-        if(currentprofitsum < 0):
-            print('StockCode:' + sys.argv[1])
-            print('MeanWave:' + '%.2f' % meanwave)
-            print('HighWave:' + '%.2f' % highwave)
-            print('InvestCount:' + '%d' % investcount)
-            print('ProfitLoss:' + '%.2f' % currentprofitsum)
-            print('Percent:' + '%.2f' % (currentprofitsum/investcount/10))
-            print('\n')
+        print('StockCode:' + sys.argv[1])
+        print('MeanWave:' + '%.2f' % meanwave)
+        print('HighWave:' + '%.2f' % highwave)
+        print('InvestCount:' + '%d' % investcount)
+        print('ProfitLoss:' + '%.2f' % currentprofitsum)
+        print('Percent:' + '%.2f' % (currentprofitsum/investcount/10))
+        print('\n')

@@ -70,7 +70,7 @@ for code in basicinfo.index:
                         histinvestinfo += 'UseTime:' + str(investcount) + '\n'
 
             #print the result
-            if(currentprofitsum < 0) & (investcount >= 10):
+            if(currentprofitsum < 0) & (investcount >= 5):
                 print('StockCode:' + code)
                 print(histinvestinfo)
                 print('MeanWave:' + '%.2f' % meanwave)

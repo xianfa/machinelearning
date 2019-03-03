@@ -12,10 +12,11 @@ if 2 > len(sys.argv):
 
 print('Code:' + sys.argv[1])
 
-histdata = pd.read_csv('./FundData/' + sys.argv[1] + '.csv')
+histdata = pd.read_csv('./FundData/' + sys.argv[1] + '.csv', dtype={'high':float})
 if histdata is None:
     print('Get histdata failed!')
     exit()
+print(histdata['open'])
 if 1 < len(histdata):
     print('StockCode:' + sys.argv[1])
     curentwavesum = 0.0
