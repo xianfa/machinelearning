@@ -22,7 +22,6 @@ for code in basicinfo.index:
     if histdata is None:
         continue
     if 1 < len(histdata):
-        print('StockCode:' + code)
         curentwavesum = 0.0
         currentprofitsum = 0.0
         highwave = 0.0
@@ -54,6 +53,7 @@ for code in basicinfo.index:
             currentindex = 1
             investcount = 0
             currentprofitsum = 0
+            histinvestinfo = ''
             while currentindex < len(histdata):
                 investcount = 0
                 currentprofitsum = 0
@@ -67,11 +67,12 @@ for code in basicinfo.index:
                     startindex = currentindex
                     currentindex += 1
                     if investcount > 10:
-                        print('UseTime:' + str(investcount))
+                        histinvestinfo += 'UseTime:' + str(investcount) + '\n'
 
             #print the result
-            if(currentprofitsum < 0):
+            if(currentprofitsum < 0) & (investcount >= 10):
                 print('StockCode:' + code)
+                print(histinvestinfo)
                 print('MeanWave:' + '%.2f' % meanwave)
                 print('HighWave:' + '%.2f' % highwave)
                 print('InvestCount:' + '%d' % investcount)
