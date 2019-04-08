@@ -61,9 +61,11 @@ if 1 < len(histdata):
                 else:
                     currentprofitloss = (closelist[currentindex]/closelist[i] - 1)*1000
                 currentprofitsum += currentprofitloss
-            if currentprofitsum < 0:
+            if currentprofitsum < 5:
                 currentindex += 1
             else:
+                print('CurrentProfitSum:' + str(currentprofitsum))
+                print('StartIndex:' + str(startindex) + ' CurrentIndex:' + str(currentindex) + ' UseTime:' + str(investcount))
                 startindex = currentindex
                 currentindex += 1
                 if investcount > 10:

@@ -95,7 +95,7 @@ if __name__ == '__main__':
             profit *= 100
             strprofit = '%.3f' % profit
             strline += formatstr(strprofit, 8)
-        #print(strline)
+        print(strline)
 
     #compute profitloss totalin and percent for every policy 
     fixprofitlossarray = []

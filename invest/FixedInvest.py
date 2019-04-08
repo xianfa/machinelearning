@@ -158,6 +158,11 @@ if __name__ == '__main__':
     
     plt.plot(x, y)
     plt.title('fixinvest profitloss percent chart', fontsize=20)
-    plt.savefig('./fixinvest.jpg')
+    plt.savefig('./fixinvest.png')
     plt.show()
-
+    
+    y = np.array(fixprofitlossarray)
+    plt.plot(x, y)
+    plt.title('fix profitloss chart' , fontsize=20)
+    plt.savefig('./fixprofitloss.png')
+    plt.show()

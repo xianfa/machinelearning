@@ -65,7 +65,7 @@ for code in basicinfo.index:
                     currentindex += 1
 
             #print the result
-            if(currentprofitsum < 0):
+            if(currentprofitsum > -1000000000):
                 print('StockCode:' + code)
                 print('MeanWave:' + '%.2f' % meanwave)
                 print('HighWave:' + '%.2f' % highwave)
