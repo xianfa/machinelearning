@@ -16,7 +16,7 @@ print('MinMeanWave:' + sys.argv[3])
 #get all the stock code then get everyone history data and handle it
 basicinfo = ts.get_stock_basics()
 #handle everyone stock
-print('StockCode,MeanWave,HighWave,InvestCount,ProfitLoss,Percent')
+print('StockCode,MeanWave,HighWave,LossPercent,InvestCount,ProfitLoss,Percent')
 for code in basicinfo.index:
     histdata = ts.get_hist_data(code, start=sys.argv[1], end=sys.argv[2])
     if histdata is None:
@@ -54,6 +54,7 @@ for code in basicinfo.index:
             investcount = 0
             currentprofitsum = 0
             histinvestinfo = ''
+            
             while currentindex < len(histdata):
                 investcount = 0
                 currentprofitsum = 0
@@ -75,7 +76,13 @@ for code in basicinfo.index:
                 currentprofitloss = (closelist[currentindex]/closelist[i] - 1)*1000
                 currentprofitsum += currentprofitloss
 
+            highprice = 0
+            for i in range(0, currentindex):
+                if highprice < highlist[i]:
+                    highprice = highlist[i]
+            losspercent = (1 - closelist[currentindex]/highprice)*100
+
             #print the result
             if(currentprofitsum < -0.1) & (investcount >= 3):
-                print(code + ',' + '%.2f' % meanwave + ',' + '%.2f' % highwave + ',' + '%d' % investcount + ',' + '%.2f' % currentprofitsum + ',' + '%.2f' % (currentprofitsum/investcount/10))
+                print(code + ',' + '%.2f' % meanwave + ',' + '%.2f' % highwave + ',' + '%.2f' % losspercent + ','  + '%d' % investcount + ',' + '%.2f' % currentprofitsum + ',' + '%.2f' % (currentprofitsum/investcount/10))
                 #print(histinvestinfo)
