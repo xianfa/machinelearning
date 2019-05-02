@@ -16,7 +16,7 @@ print('MinMeanWave:' + sys.argv[3])
 #get all the stock code then get everyone history data and handle it
 basicinfo = ts.get_stock_basics()
 #handle everyone stock
-
+print('StockCode,MeanWave,HighWave,LosePercent,RisePercent,InvestCount,ProfitLoss,Percent')
 for code in basicinfo.index:
     histdata = ts.get_hist_data(code, start=sys.argv[1], end=sys.argv[2])
     if histdata is None:
@@ -25,6 +25,8 @@ for code in basicinfo.index:
         curentwavesum = 0.0
         currentprofitsum = 0.0
         highwave = 0.0
+        highprice = 0.0
+        lowprice = 100000.0
         for i in range(1, len(histdata)):
             growwave = abs(histdata[i-1:i]['high'].values[0]/histdata[i:i+1]['close'].values[0] - 1)
             belowwave = abs(histdata[i-1:i]['low'].values[0]/histdata[i:i+1]['close'].values[0] - 1)
@@ -37,6 +39,15 @@ for code in basicinfo.index:
             if highwave < maxwave:
                 highwave = maxwave
             curentwavesum += maxwave
+            if highprice < histdata[i-1:i]['high'].values[0]:
+                highprice = histdata[i-1:i]['high'].values[0]
+            if highprice < histdata[i:i+1]['high'].values[0]:
+                highprice = histdata[i:i+1]['high'].values[0]
+            if lowprice > histdata[i-1:i]['low'].values[0]:
+                lowprice = histdata[i-1:i]['low'].values[0]
+            if lowprice > histdata[i:i+1]['low'].values[0]:
+                lowprice = histdata[i:i+1]['low'].values[0]
+
         meanwave = curentwavesum/(len(histdata)-1)*100
 
         if meanwave > float(sys.argv[3]):
@@ -63,16 +74,10 @@ for code in basicinfo.index:
                 else:
                     startindex = currentindex
                     currentindex += 1
-
+            losepercent = (1-closelist[len(histdata)-1]/highprice)*100
+            risepercent = (closelist[len(histdata)-1]/lowprice-1)*100
             #print the result
-            if(currentprofitsum > -1000000000):
-                print('StockCode:' + code)
-                print('MeanWave:' + '%.2f' % meanwave)
-                print('HighWave:' + '%.2f' % highwave)
-                print('InvestCount:' + '%d' % investcount)
-                print('ProfitLoss:' + '%.2f' % currentprofitsum)
-                print('Percent:' + '%.2f' % (currentprofitsum/investcount/10))
-                print('\n')
+            print(code + ',' + '%.2f' % meanwave + ',' + '%.2f' % highwave + ',' + '%.2f' % losepercent + ',' + '%.2f' % risepercent + ',' + '%d' % investcount + ',' + '%.2f' % currentprofitsum + ',' + '%.2f' % (currentprofitsum/investcount/10))
 
 
 basicinfo.loc[((basicinfo.index >= u'600000') | (basicinfo.index < u'100000')) & (basicinfo['timeToMarket'] < 20160218) & (basicinfo['pe'] > 0) & (basicinfo['pe'] < 20) & (basicinfo['bvps']*basicinfo['totals']*basicinfo['pb'] < 50)].to_csv('./basicinfo.csv')
