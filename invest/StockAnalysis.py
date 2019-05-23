@@ -13,6 +13,10 @@ print('StartTime:' + sys.argv[1])
 print('EndTime:' + sys.argv[2])
 print('MinMeanWave:' + sys.argv[3])
 
+#get index data
+indexdata = ts.get_hist_data('sh', start=sys.argv[1], end=sys.argv[2])
+print(indexdata)
+
 #get all the stock code then get everyone history data and handle it
 basicinfo = ts.get_stock_basics()
 #handle everyone stock
@@ -82,7 +86,15 @@ for code in basicinfo.index:
                     highprice = highlist[i]
             losspercent = (1 - closelist[currentindex]/highprice)*100
 
+            #compute strong weak
+            strongcount = 0.0
+            if len(histdata) == len(indexdata):
+                for i in range(0, len(histdata)):
+                    if histdata[i:i+1]['p_change'].values[0] > indexdata[i:i+1]['p_change'].values[0]:
+                        strongcount += 1
+            strongrate = strongcount/len(indexdata)
+
             #print the result
             if(currentprofitsum < -0.1) & (investcount >= 3):
-                print(code + ',' + '%.2f' % meanwave + ',' + '%.2f' % highwave + ',' + '%.2f' % losspercent + ','  + '%d' % investcount + ',' + '%.2f' % currentprofitsum + ',' + '%.2f' % (currentprofitsum/investcount/10))
+                print(code + ',' + '%.2f' % meanwave + ',' + '%.2f' % highwave + ',' + '%.2f' % losspercent + ','  + '%d' % investcount + ',' + '%.2f' % currentprofitsum + ',' + '%.2f' % (currentprofitsum/investcount/10) + ',' + '%.2f' % strongrate)
                 #print(histinvestinfo)

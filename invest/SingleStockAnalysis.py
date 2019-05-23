@@ -13,7 +13,9 @@ print('Code:' + sys.argv[1])
 print('StartTime:' + sys.argv[2])
 print('EndTime:' + sys.argv[3])
 
+indexdata = ts.get_hist_data('sh', start=sys.argv[2], end=sys.argv[3])
 histdata = ts.get_hist_data(sys.argv[1], start=sys.argv[2], end=sys.argv[3])
+
 if histdata is None:
     print('Get histdata failed!')
     exit()
@@ -70,6 +72,14 @@ if 1 < len(histdata):
                 currentindex += 1
                 if investcount > 10:
                     print('UseTime:' + str(investcount))
+                    
+        #compute strong weak
+        strongcount = 0.0
+        if len(histdata) == len(indexdata):
+            for i in range(0, len(histdata)):
+                if histdata[i:i+1]['p_change'].values[0] > indexdata[i:i+1]['p_change'].values[0]:
+                    strongcount += 1
+        strongrate = strongcount/len(indexdata)
 
         #print the result
         print('StockCode:' + sys.argv[1])
@@ -78,4 +88,5 @@ if 1 < len(histdata):
         print('InvestCount:' + '%d' % investcount)
         print('ProfitLoss:' + '%.2f' % currentprofitsum)
         print('Percent:' + '%.2f' % (currentprofitsum/investcount/10))
+        print('StrongRate:' + '%.2f' % strongrate)
         print('\n')
